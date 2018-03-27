@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="RightMove" configfailurepolicy="continue"
+	parallel="classes" thread-count="2">
+	
+	<!--<listeners>
+			<listener class-name="com.Engine.TestListener" />
+		</listeners>
+	-->
+	
+	<test name="RightMove_All">
+		<classes>
+			<class name="testsuite.lettings.lettings" />			  
+			<class name="testsuite.sales.sales" />
+			
+		</classes>
+	</test>
+</suite>
