@@ -16,23 +16,31 @@ public class readExcelSheet {
 	public readExcelSheet() {
 
 	}
+	
+	
+	Object[][] tabArray = null;
+	Workbook workbk;
+	Sheet sheet;
+	int rowCount;
+	int [] rowlist;
+	// String sheetPath = LoadEnvironment.workingDir+LoadEnvironment.INPUTSHEET;
+	int colCount;
+	int counter = 0;
+	int counter2 = 0;
+	
 
 	public Sheet Excel(String filename, String sheetname) throws Exception {
 		Sheet sheet = null;
 		try {
-			System.out.println("input file name  " + filename);
-			System.out.println("InputSheet name  " + sheetname);
+
+
 			WorkbookSettings settings = new WorkbookSettings();
 			settings.setLocale(new Locale("en", "EN"));
-
 			settings.setNamesDisabled(true);
 			settings.setFormulaAdjust(true);
-			// settings.setMergedCellChecking(true);
-			// settings.setCellValidationDisabled(true);
 
 			Workbook workbook = Workbook.getWorkbook(new File(filename), settings);
 			sheet = workbook.getSheet(sheetname);
-			System.out.println("End of test");
 		} catch (Exception e) {
 			e.printStackTrace();
 			
@@ -43,20 +51,108 @@ public class readExcelSheet {
 		}
 		return sheet;
 	}
+	
+	public Object[][] getExcelData(String WorkBookPath, String shtName, String ScriptName) throws Exception {
+		try {
+			Workbook workbk = Workbook.getWorkbook(new File(WorkBookPath));
+			Sheet sheet = workbk.getSheet(shtName);
+			rowCount = sheet.getRows();
+			colCount = sheet.getColumns();
+			int counter = 0;
+			int counter2 = 0;
+			int row = sheet.getRows();
+			int column = 0;
+			int Executecolumn = sheet.findCell("TO_BE_EXECUTED").getColumn();
+			column = sheet.findCell("SCRIPT_ID").getColumn();
+
+			for (int i = 0; i < row; i++) {
+				System.out.println("Scriptname"+sheet.getCell(column, i).getContents());
+				if (sheet.getCell(column, i).getContents().equalsIgnoreCase(ScriptName)
+						&& (sheet.getCell(Executecolumn, i).getContents().equalsIgnoreCase("YES"))) {
+					
+					
+	
+					counter += 1;
+				}
+			}
+			tabArray = new String[counter][2];
+			for (int i = 0; i < row; i++) {
+				if ((sheet.getCell(column, i).getContents().equalsIgnoreCase(ScriptName))) {
+					if ((sheet.getCell(Executecolumn, i).getContents().equalsIgnoreCase("YES"))) {
+						tabArray[counter2][0] = ScriptName;
+						tabArray[counter2][1] = Integer.toString(i);
+						System.out.println("EXECUTING " + ScriptName + " FROM ROW--------- " + Integer.toString(i));
+						counter2++;
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			// System.out.println("Problem with Dataprovider");
+		}
+		if (tabArray == null) {
+			return new String[0][0];
+		}
+		return (tabArray);
+	}
+	
+	public String getnumberofrow(String WorkBookPath, String shtName, String ScriptName) throws Exception {
+		try {
+			Workbook workbk = Workbook.getWorkbook(new File(WorkBookPath));
+			Sheet sheet = workbk.getSheet(shtName);
+			rowCount = sheet.getRows();
+			colCount = sheet.getColumns();
+
+			int row = sheet.getRows();
+			int column = 0;
+			int Executecolumn = sheet.findCell("TO_BE_EXECUTED").getColumn();
+			column = sheet.findCell("SCRIPT_ID").getColumn();
+
+			rowlist =new int[row];
+			
+			for (int i = 0; i < row; i++) {
+				
+				if (sheet.getCell(column, i).getContents().equalsIgnoreCase(ScriptName)
+						&& (sheet.getCell(Executecolumn, i).getContents().equalsIgnoreCase("NO"))) {
+					
+					System.out.println("count"+counter+"i value is"+i);
+
+					
+					counter += 1;					
+					rowlist[counter] = i;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			// System.out.println("Problem with Dataprovider");
+		}
+		
+		return Integer.toString(counter);
+	}
+	
+	
+	
 
 	public Map<String, String> CreateMapFromExcel(String WorkbookLocation, String SheetName, String Row)
 			throws Exception {
 		try{
 		Map<String, String> map = new HashMap<String, String>();
-		if (Row.equals("-1")) {
+		
+
+		
+		if (Row.equals("0")) {
 			//don't do anything and return null
 		} else {
 			Sheet sheet = Excel(WorkbookLocation, SheetName);
-			System.out.println("is");
+
 			int column = sheet.getColumns();
 			int row = Integer.parseInt(Row);
-			for (int i = 0; i < column; i++) {
+			for (int i = 1; i < column; i++) {
 				String KEY = sheet.getCell(i, 0).getContents();
+				
+				System.out.println(SheetName+"getcell of "+i+"row"+row);
+				
 				String VALUE = sheet.getCell(i, row).getContents();
 				if (VALUE == null) {
 					VALUE = "";
@@ -70,5 +166,7 @@ public class readExcelSheet {
 		}
 		return null;
 	}
+	
+	
 
 }
